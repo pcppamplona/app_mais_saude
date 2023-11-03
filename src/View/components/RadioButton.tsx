@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Icon from "react-native-vector-icons/Fontisto";
 
-
 const RadioButton = ({ options = [], horizontal = true, onChangeSelect }) => {
   const [selectedOption, setSelectedOption] = useState(null);
 
@@ -12,19 +11,19 @@ const RadioButton = ({ options = [], horizontal = true, onChangeSelect }) => {
   };
 
   return (
-    <View className="flex-row mb-4 w-9/12 justify-between">
+    <View style={{ flexDirection: horizontal ? "row" : "column", marginBottom: 4, width: "75%", justifyContent: "space-between" }}>
       {options.map((opt) => (
         <TouchableOpacity
           key={opt}
           onPress={() => handleOptionSelect(opt)}
-          className="flex-row items-center"
+          style={{ flexDirection: "row", alignItems: "center" }}
         >
-          <View className="w-6 h-6 border-2 rounded-full border-white mr-2 justify-center items-center">
+          <View style={{ width: 24, height: 24, borderWidth: 2, borderRadius: 12, borderColor: "white", marginRight: 8, justifyContent: "center", alignItems: "center" }}>
             {selectedOption === opt && (
               <Icon name="check" size={16} color="#fff" />
             )}
           </View>
-          <Text className="text-white">{opt}</Text>
+          <Text style={{ color: "white" }}>{opt}</Text>
         </TouchableOpacity>
       ))}
     </View>
