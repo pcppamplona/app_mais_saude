@@ -65,12 +65,18 @@ export function RecoverPassScreen({ navigation }) {
       <View className="flex-1 items-center justify-start">
         {/* Container com a imagem */}
         <View className="w-full h-[30%] items-center bg-[#2BB459] relative">
+
+        <View className="mt-7 mr-auto bg-[#2BB459] w-full">
+          <TouchableOpacity className="ml-4" onPress={() => navigation.goBack()}>
+            <Icon name="angle-left" size={20} color="#fff" />
+          </TouchableOpacity>
+        </View>
+        
           <Image
             source={require("../../../../assets/illustrations/login.png")}
-            className="w-[370px] h-[250px] absolute top-[20%] bottom-0 animate-pulse"
+            className="w-[370px] h-[250px] absolute top-[25%] bottom-0 animate-pulse"
           />
         </View>
-
         <View className="mt-24">
           <Text className="text-black font-bold text-2xl">Atualizar Senha</Text>
         </View>

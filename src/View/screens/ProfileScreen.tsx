@@ -135,7 +135,7 @@ export function ProfileScreen({ navigation }) {
   };
 
   return (
-    <ScrollView>
+    <ScrollView className="bg-white">
       <TouchableOpacity
         className="mt-[10%] ml-auto mr-4"
         onPress={() => {
@@ -303,7 +303,7 @@ export function ProfileScreen({ navigation }) {
               className="flex-row items-center justify-start mt-2 pt-4 pl-4 pr-4 border-t-[1px] border-[#EAEAEA]"
               onPress={() => {
                 console.log("Settings pressed!");
-                navigation.navigate("Settings")
+                navigation.navigate("Settings");
               }}
             >
               <Icon
@@ -358,61 +358,35 @@ export function ProfileScreen({ navigation }) {
               </Text>
             </TouchableOpacity>
 
-            <Modal visible={isModalVisible} animationType="slide">
+            <Modal
+              transparent={true}
+              visible={isModalVisible}
+              animationType="slide"
+              onRequestClose={() => setModalVisible(false)}
+            >
               <View
+                className="flex-1 justify-center items-center"
                 style={{
-                  flex: 1,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  backgroundColor: "rgba(0, 0, 0, 0.5)",
                 }}
               >
-                <View
-                  style={{
-                    backgroundColor: "white",
-                    padding: 20,
-                    borderRadius: 10,
-                  }}
-                >
-                  {/* Verifica se a confirmação de exclusão está ativa */}
-                  {isConfirmingDeletion ? (
-                    <View>
-                      <Text>Digite sua senha:</Text>
-                      <TextInput
-                        secureTextEntry
-                        placeholder="Senha"
-                        value={password}
-                        onChangeText={setPassword}
-                      />
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Button
-                          title="Confirmar"
-                          onPress={handleConfirmDelete}
-                        />
-                        <Button title="Cancelar" onPress={toggleModal} />
-                      </View>
-                    </View>
-                  ) : (
-                    <View>
-                      <Text>Tem certeza de que deseja excluir sua conta?</Text>
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <Button
-                          title="Sim"
-                          onPress={toggleDeletionConfirmation}
-                        />
-                        <Button title="Não" onPress={toggleModal} />
-                      </View>
-                    </View>
-                  )}
+                <View className="bg-white p-4 rounded-md">
+                  {/* Conteúdo do seu modal */}
+                  <Text className="text-base font-bold mb-2">
+                    Tem certeza de que deseja excluir sua conta?
+                  </Text>
+                  <View className="flex flex-row justify-around">
+                    <Button
+                      title="Sim"
+                      onPress={toggleDeletionConfirmation}
+                      color="#FF183F"
+                    />
+                    <Button
+                      title="Não"
+                      onPress={() => setModalVisible(false)}
+                      color="#007bff"
+                    />
+                  </View>
                 </View>
               </View>
             </Modal>

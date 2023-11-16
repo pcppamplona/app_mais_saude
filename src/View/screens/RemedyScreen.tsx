@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Button,
   TouchableOpacity,
-  Modal,
   Image,
+  FlatList,
+  TextInput,
+  TouchableWithoutFeedback,
 } from "react-native";
 import Remedio from "../components/remedio";
 import { FontAwesome } from "@expo/vector-icons";
@@ -19,16 +20,41 @@ import FormNewRemedio from "../components/FormNewRemedio";
 import FormEditRemedio from "../components/FormEditRemedio";
 
 export function RemedyScreen({ navigation }) {
-  const [remedios, setRemedios] = useState([]); //estado pra puxar do banco os remedios
+  const [remedios, setRemedios] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isModalEditRemedio, setIsModalEditRemedio] = useState(false);
   const [idRemedioEditing, setIdRemedioEditing] = useState();
-
   const [criarRemedios, setCriarRemedios] = useState([]);
+  const [expandedRemedio, setExpandedRemedio] = useState(null);
+  const [searchText, setSearchText] = useState("");
+
+  const [isSearchBarVisible, setIsSearchBarVisible] = useState(false);
+
+  const toggleSearchBar = () => {
+    setIsSearchBarVisible(!isSearchBarVisible);
+  };
+
+  const closeSearchBar = () => {
+    setIsSearchBarVisible(false);
+  };
+
+  const handleRemedioPress = (id_remedio) => {
+    setExpandedRemedio(id_remedio === expandedRemedio ? null : id_remedio);
+  };
+
+  const updateRemediosList = async () => {
+    try {
+      const id_usuario = usuarioSessao;
+      const data = await RemedioController.BuscarRemedios(id_usuario);
+      setRemedios(data);
+    } catch (error) {
+      console.error("Erro ao buscar remédios:", error);
+    }
+  };
+
   const addRemedio = async (novoRemedio) => {
     try {
       setCriarRemedios([...criarRemedios, novoRemedio]);
-
       const { nomeRemedio, horarioInicial, quantidadeDias, frequencia } =
         novoRemedio;
       const id_usuario = usuarioSessao;
@@ -41,55 +67,53 @@ export function RemedyScreen({ navigation }) {
         frequencia
       );
 
-      try {
-        const BuscarUltimoRemedio =
-          await RemedioController.BuscarUltimoRemedio();
+      const BuscarUltimoRemedio = await RemedioController.BuscarUltimoRemedio();
 
-        try {
-          console.log("Retornando no front:", BuscarUltimoRemedio);
-          if (BuscarUltimoRemedio) {
-            const {
-              id_remedio,
-              Nome_Remedio,
-              Horario_Inicial,
-              Frequencia,
-              Qntd_Total,
-            } = BuscarUltimoRemedio;
-            await agendarNotificacoes(
-              id_remedio,
-              Nome_Remedio,
-              Horario_Inicial,
-              Frequencia,
-              Qntd_Total
-            );
-          } else {
-            console.error("Nenhum remédio encontrado.");
-          }
-
-          // Outras ações após a criação e busca do último remédio
-        } catch (error) {
-          console.error("Erro ao exibir resultado no front:", error);
-        }
-      } catch (error) {
-        console.error("Erro ao buscar o último remédio:", error);
+      if (BuscarUltimoRemedio) {
+        const {
+          id_remedio,
+          Nome_Remedio,
+          Horario_Inicial,
+          Frequencia,
+          Qntd_Total,
+        } = BuscarUltimoRemedio;
+        await agendarNotificacoes(
+          id_remedio,
+          Nome_Remedio,
+          Horario_Inicial,
+          Frequencia,
+          Qntd_Total
+        );
+      } else {
+        console.error("Nenhum remédio encontrado.");
       }
+
+      await updateRemediosList();
     } catch (error) {
       console.error("Erro ao criar remédio:", error);
     }
   };
 
-  const editRemedio = async (editedRemedio) => {};
+  const editRemedio = async (editedRemedio) => {
+    try {
+      await updateRemediosList();
+    } catch (error) {
+      console.error("Erro ao editar remédio:", error);
+    }
+  };
 
   useEffect(() => {
     const id_usuario = usuarioSessao;
     async function limparNotificacoesAgendadas() {
       await Notifications.cancelAllScheduledNotificationsAsync();
     }
-    //limparNotificacoesAgendadas();
+
+    limparNotificacoesAgendadas();
 
     RemedioController.BuscarRemedios(id_usuario)
       .then((data) => {
         setRemedios(data);
+        console.log("Remedios:", data);
       })
       .catch((error) => {
         console.error("Erro ao buscar remédios:", error);
@@ -97,8 +121,9 @@ export function RemedyScreen({ navigation }) {
   }, []);
 
   useEffect(() => {
-    //agendarNotificacoes("Novo Remédio", "16:43:00", "00:00:30", 3);
-    //Notifications.cancelAllScheduledNotificationsAsync();
+    // Agendar ou cancelar notificações conforme necessário
+    // agendarNotificacoes("Novo Remédio", "16:43:00", "00:00:30", 3);
+    // Notifications.cancelAllScheduledNotificationsAsync();
   });
 
   useEffect(() => {
@@ -202,83 +227,142 @@ export function RemedyScreen({ navigation }) {
     setIsModalEditRemedio(true);
   };
 
-  const handleExcluirRemedio = (idRemedio) => {
+  const handleExcluirRemedio = async (idRemedio) => {
     console.log(`Excluir remédio com ID ${idRemedio}`);
     try {
       const id_usuario = usuarioSessao;
       RemedioController.excluirRemedio(id_usuario, idRemedio);
       Notifications.cancelScheduledNotificationAsync(idRemedio.toString());
+      await updateRemediosList();
     } catch (error) {
       console.log("Erro ao excluir remédio");
     }
   };
 
   return (
-    <View className="flex-1 flex-col bg-white">
-      <TouchableOpacity
-        onPress={toggleModal}
-        className="bg-[#2BB459] w-10 h-10 rounded-full justify-center items-center"
-        style={{
-          position: "absolute",
-          bottom: 20,
-          right: 20,
-        }}
-      >
-        {/* <FontAwesome name="plus" size={24} color="white" /> */}
-        <Icon name="plus" size={22} color="white" />
-      </TouchableOpacity>
+    <TouchableWithoutFeedback onPress={() => closeSearchBar()}>
+      <View className="flex-1 flex-col bg-[#fff]">
+        <TouchableOpacity
+          onPress={() => toggleModal()}
+          style={{
+            position: "absolute",
+            bottom: 20,
+            right: 20,
+            zIndex: 1,
+            width: 40,
+            height: 40,
+            borderRadius: 100,
+            justifyContent: "center",
+            alignItems: "center",
+            backgroundColor: "#2BB459",
+          }}
+        >
+          <Icon name="plus" size={22} color="white" />
+        </TouchableOpacity>
 
-      <ModalRemedio isVisible={isModalVisible}>
-        <FormNewRemedio
-          isVisible={isModalVisible}
-          closeModal={toggleModal}
-          addRemedio={addRemedio}
-        />
-      </ModalRemedio>
+        <ModalRemedio isVisible={isModalVisible}>
+          <FormNewRemedio
+            isVisible={isModalVisible}
+            closeModal={() => toggleModal()}
+            addRemedio={addRemedio}
+          />
+        </ModalRemedio>
 
-      <ModalRemedio isVisible={isModalEditRemedio}>
-        <FormEditRemedio
-          isVisible={isModalEditRemedio}
-          closeModal={toggleModalEdit}
-          editedRemedio={editRemedio}
-          id_remedio={idRemedioEditing}
-          editarNotificacao={editarNotificacao}
-        />
-      </ModalRemedio>
+        <ModalRemedio isVisible={isModalEditRemedio}>
+          <FormEditRemedio
+            isVisible={isModalEditRemedio}
+            closeModal={() => toggleModalEdit()}
+            editedRemedio={editRemedio}
+            id_remedio={idRemedioEditing}
+            editarNotificacao={editarNotificacao}
+          />
+        </ModalRemedio>
 
-      {remedios.length === 0 ? (
-        <View>
-          <View className="ml-4 mr-auto mt-10 mb-10">
-            <Text className="font-bold text-2xl text-[#28282D]">
-              Medicamentos
+        {remedios.length === 0 ? (
+          <View>
+            <View className="ml-4 mr-auto mt-10 mb-10">
+              <Text className="font-bold text-2xl text-[#28282D]">
+                Medicamentos
+              </Text>
+            </View>
+            <Image
+              source={require("../../../assets/backgrounds/fundoRemedyComplete.png")}
+              className="w-full h-auto top-[5%] bottom-0 animate-pulse"
+            />
+            <Text className="mt-10 ml-auto mr-auto line-clamp-2 items-center text-center text-lg text-[#1F9A55] font-bold">
+              Você ainda não possui nenhum{"\n"} medicamento cadastrado.
+            </Text>
+            <Text className="mt-14 ml-auto mr-auto line-clamp-2 items-center text-center text-sm text-[#282b29] font-roboto">
+              Para adicionar um novo, clique no botão{" "}
+              <Text className="text-lg text-[#1F9A55] font-semibold">+</Text>{" "}
+              abaixo e{"\n"} digite o nome do medicamento desejado..
             </Text>
           </View>
-          <Image
-            source={require("../../../assets/backgrounds/fundoRemedyComplete.png")}
-            className="w-full h-auto top-[5%] bottom-0 animate-pulse"
-          />
-          <Text className="mt-10 ml-auto mr-auto line-clamp-2 items-center text-center text-lg text-[#1F9A55] font-bold">
-            Você ainda não possui nenhum{'\n'} medicamento cadastrado.
-          </Text>
-          <Text className="mt-14 ml-auto mr-auto line-clamp-2 items-center text-center text-sm text-[#282b29] font-roboto">
-            Para adicionar um novo, clique no botão <Text className="text-lg text-[#1F9A55] font-semibold">+</Text> abaixo e{'\n'} digite o nome do medicamento desejado..
-          </Text>
-        </View>
-      ) : (
-        remedios.map((remedio) => (
-          <Remedio
-            Nome_Remedio={remedio.Nome_Remedio}
-            id_remedio={remedio.id_remedio}
-            Quantidade_Dias={remedio.Quantidade_Dias}
-            Frequencia={remedio.Frequencia}
-            Doses_Atrasadas={remedio.Doses_Atrasadas}
-            Qntd_DosesRestantes={remedio.Qntd_DosesRestantes}
-            Status={remedio.Status}
-            onEditarPress={() => handleEditarRemedio(remedio.id_remedio)} // Passa a função para editar
-            onExcluirPress={() => handleExcluirRemedio(remedio.id_remedio)} // Passa a função para excluir
-          />
-        ))
-      )}
-    </View>
+        ) : (
+          <>
+            <View className="flex flex-row w-11/12 justify-between items-center ml-4 mr-auto mt-10">
+              <Text className="font-bold text-2xl text-[#28282D]">
+                Medicamentos
+              </Text>
+              <TouchableOpacity onPress={() => toggleSearchBar()} className="">
+                <Icon name="filter" size={15} color="#2BB459" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Barra de pesquisa (condicional) */}
+            {isSearchBarVisible && (
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  marginHorizontal: 16,
+                  marginTop: 8,
+                }}
+              >
+                <TextInput
+                  className="flex-1 border-[1px] border-[#ccc] rounded-lg px-2"
+                  placeholder="Pesquisar medicamento..."
+                  value={searchText}
+                  onChangeText={(text) => setSearchText(text)}
+                />
+                <TouchableOpacity
+                  className="ml-2"
+                  onPress={() => closeSearchBar()}
+                >
+                  <Icon name="times" size={20} color="#2BB459" />
+                </TouchableOpacity>
+              </View>
+            )}
+
+            <FlatList
+              className="mt-4 mx-4"
+              data={remedios.filter((remedio) =>
+                remedio.Nome_Remedio.toLowerCase().includes(
+                  searchText.toLowerCase()
+                )
+              )}
+              keyExtractor={(item) => item.id_remedio.toString()}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  onPress={() => handleRemedioPress(item.id_remedio)}
+                >
+                  <Remedio
+                    Nome_Remedio={item.Nome_Remedio}
+                    Quantidade_Dias={item.Quantidade_Dias}
+                    Frequencia={item.Frequencia}
+                    Doses_Atrasadas={item.Doses_Atrasadas}
+                    Qntd_DosesRestantes={item.Qntd_DosesRestantes}
+                    Status={item.Status}
+                    onEditarPress={() => handleEditarRemedio(item.id_remedio)}
+                    onExcluirPress={() => handleExcluirRemedio(item.id_remedio)}
+                    expanded={item.id_remedio === expandedRemedio}
+                  />
+                </TouchableOpacity>
+              )}
+            />
+          </>
+        )}
+      </View>
+    </TouchableWithoutFeedback>
   );
 }
