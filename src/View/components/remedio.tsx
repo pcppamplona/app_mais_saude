@@ -9,7 +9,7 @@ interface RemedioProps {
   Frequencia: string;
   Doses_Atrasadas: number;
   Qntd_DosesRestantes: number;
-  Status: string;
+  Status: boolean;
   expanded: boolean;
   onEditarPress: () => void;
   onExcluirPress: () => void;
@@ -74,7 +74,7 @@ const Remedio: React.FC<RemedioProps> = ({
               Restantes: {Qntd_DosesRestantes}
             </Text>
             <Text className="mt-1 ml-1">
-              <Icon name="info" size={15} color="#FCCA60" />    Status: {Status}
+              <Icon name="info" size={15} color="#FCCA60" />    Status: {Status ? 'Finalizado' : 'Em andamento'}
             </Text>
             <Text className="mt-1">
               <Icon name="warning" size={15} color="#FD151B" />   Doses Atrasadas:{" "}
