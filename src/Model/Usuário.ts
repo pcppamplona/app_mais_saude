@@ -3,15 +3,12 @@ import supabase from "./services/supabase";
 import { supabaseApiKey } from "./services/supabaseApiKey";
 import UsuarioController from "../Controller/UsuarioController";
 
-
-
-
 class Usuario{
     Email: string;
     Senha: string;
     Nome_Completo: string;
     CPF: string;
-    Data_Nascimento: Date;
+    Data_Nascimento: string;
     Sexo: string;
 
     constructor(Email: string, Senha: string, Nome_Completo: string, CPF: string, Data_Nascimento: string, Sexo: string){
@@ -19,7 +16,7 @@ class Usuario{
         this.Senha = Senha;
         this.Nome_Completo = Nome_Completo;
         this.CPF = CPF;
-        this.Data_Nascimento = new Date(Data_Nascimento);
+        this.Data_Nascimento = Data_Nascimento;
         this.Sexo = Sexo;
     }
     async cadastro(
@@ -38,7 +35,7 @@ class Usuario{
                     Senha: senha,
                     Nome_Completo: nome_completo,
                     CPF: cpf,
-                    Data_Nascimento: new Date(data_nascimento),
+                    Data_Nascimento: data_nascimento,
                     Sexo: sexo
                 },
                 {

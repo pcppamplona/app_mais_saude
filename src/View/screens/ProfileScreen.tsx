@@ -134,6 +134,16 @@ export function ProfileScreen({ navigation }) {
     setIsConfirmingDeletion(!isConfirmingDeletion);
   };
 
+  const handleLogout = () => {
+    // Adicione aqui qualquer lógica necessária para realizar o logout,
+    // como limpar o token de autenticação, limpar o estado da sessão, etc.
+  
+    // Exemplo: Limpar o token de autenticação e redirecionar para a tela de login
+    // (Você pode ajustar isso conforme a implementação específica do seu aplicativo)
+    // AsyncStorage.removeItem('token'); // Se estiver usando AsyncStorage para armazenar o token
+    navigation.navigate("Login");
+  };
+
   return (
     <ScrollView className="bg-white">
       <TouchableOpacity
@@ -334,9 +344,7 @@ export function ProfileScreen({ navigation }) {
             {/* BOTÃO LOGOUT */}
             <TouchableOpacity
               className="flex-row items-center justify-start mt-4 pt-4 pl-4 pr-4 border-t-[1px] border-[#EAEAEA]"
-              onPress={() => {
-                console.log("Logout pressed!");
-              }}
+              onPress={handleLogout}
             >
               <Icon name="power" size={18} color="#FF183F" className="mr-2" />
               <Text className="text-sm font-bold ml-3 text-[#FF183F]">

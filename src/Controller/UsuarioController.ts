@@ -3,10 +3,10 @@ import EmailController from "./EmailController"
 
 class UsuarioController{
     static cadastrarUsuario(email: string, senha: string,nome_completo: string,cpf: string,data_nascimento: string,sexo: string) {
-      const dataNascimentoParts = data_nascimento.split('-');
-      const dataNascimentoFormatted = `${dataNascimentoParts[2]}-${dataNascimentoParts[1]}-${dataNascimentoParts[0]}`;  
-      const usuario = new Usuario(email, senha, nome_completo, cpf, dataNascimentoFormatted, sexo);
-      usuario.cadastro(email, senha, nome_completo, cpf, dataNascimentoFormatted, sexo); // Chama diretamente o método post() do modelo User
+      //const dataNascimentoParts = data_nascimento.split('-');
+      //const dataNascimentoFormatted = `${dataNascimentoParts[2]}-${dataNascimentoParts[1]}-${dataNascimentoParts[0]}`;  
+      const usuario = new Usuario(email, senha, nome_completo, cpf, data_nascimento, sexo);
+      usuario.cadastro(email, senha, nome_completo, cpf, data_nascimento, sexo); // Chama diretamente o método post() do modelo User
     }
 
     static async verificarEmail(email: string): Promise<boolean> {

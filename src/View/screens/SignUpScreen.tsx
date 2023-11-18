@@ -57,12 +57,12 @@ export function SignUpScreen({ navigation }) {
     } else {
       // Email não cadastrado, continuar com o cadastro
       UsuarioController.cadastrarUsuario(
+        email,
+        password,
         name,
         cpf,
-        email,
         formattedDate,
-        sexo,
-        password,
+        sexo
       );
     }
   };

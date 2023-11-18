@@ -1,151 +1,152 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Image } from "react-native";
 import { TextInput } from "react-native-paper";
 import UsuarioController from "../../../Controller/UsuarioController";
+import { ScrollView } from "react-native";
+import Icon from "react-native-vector-icons/Fontisto";
 
 export function ForgotPassScreen({ navigation }) {
-  const [email, setEmail] = useState('');
-  const [isEmailVerified, setIsEmailVerified] = useState(false); // Novo estado para controlar se o e-mail foi verificado
-  const [verificationCode, setVerificationCode] = useState('');
+  const [email, setEmail] = useState("");
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
   const [isCodigoEditable, setIsCodigoEditable] = useState(false);
-  const [textCodigo, setTextCodigo] = useState('Enviar Código')
+  const [textCodigo, setTextCodigo] = useState("Enviar Código");
   const [isPasswordEditable, setIsPasswordEditable] = useState(false);
   const [isBtnCodigoDisabled, setIsBtnCodigoDisabled] = useState(true);
   const [isBtnPasswordDisabled, setIsBtnPasswordDisabled] = useState(true);
-  const [codigoDigitado, setCodigoDigitado] = useState('');
-  const [codigoEmail, setCodigoEmail] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [codigoDigitado, setCodigoDigitado] = useState("");
+  const [codigoEmail, setCodigoEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   const handleVerificaEmail = async () => {
-    console.log(email.length);
     if (email.length > 0) {
       const isEmailRegistered = await UsuarioController.verificarEmail(email);
 
       if (isEmailRegistered) {
-        setIsEmailVerified(true); // Define isEmailVerified como verdadeiro se o e-mail estiver registrado
+        setIsEmailVerified(true);
         setIsBtnCodigoDisabled(false);
-        console.log(email)
       } else {
-        alert('Email não cadastrado!');
+        alert("Email não cadastrado!");
       }
     }
   };
 
   const handleEnviarCodigo = async () => {
-    if(textCodigo == 'Enviar Código'){
-      setTextCodigo("Confirmar Código")
+    if (textCodigo === "Enviar Código") {
+      setTextCodigo("Confirmar Código");
       setIsCodigoEditable(true);
-      console.log(email)
 
-      try{
-        const codigo = await UsuarioController.CodigoAleatorio(email)
+      try {
+        const codigo = await UsuarioController.CodigoAleatorio(email);
 
         if (codigo) {
           console.log("Código de verificação atual:", codigo);
           setCodigoEmail(codigo);
         } else {
           console.error("Código de verificação não recebido");
-          setCodigoEmail('');
+          setCodigoEmail("");
         }
-      }catch(error){
+      } catch (error) {
         console.error("Erro ao enviar código:", error);
       }
-    }else if(textCodigo == "Confirmar Código"){
-      if(codigoDigitado == codigoEmail){
-        console.log("Código está correto")
+    } else if (textCodigo === "Confirmar Código") {
+      if (codigoDigitado === codigoEmail) {
         setIsPasswordEditable(true);
-        setIsBtnPasswordDisabled(false)
-      }else if(codigoDigitado !== codigoEmail){
-        alert("Código está INCORRETO!")
+        setIsBtnPasswordDisabled(false);
+      } else if (codigoDigitado !== codigoEmail) {
+        alert("Código está INCORRETO!");
       }
     }
-    
-  }
+  };
 
-  const handleAtualizarSenha = async () =>{
+  const handleAtualizarSenha = async () => {
     if (newPassword.length > 5) {
       try {
         await UsuarioController.AtualizarSenha(email, newPassword);
-        alert("Senha atualizada com sucesso!")
+        alert("Senha atualizada com sucesso!");
       } catch (error) {
         console.error("Erro ao atualizar senha:", error);
-        // Trate o erro como desejar, exiba uma mensagem de erro, por exemplo.
       }
     } else {
       alert("Digite uma senha maior!");
     }
-  }
-
+  };
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ color: 'red' }}>Esqueci minha senha</Text>
-      <View>
+    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+      <View className="flex-1 items-center justify-start">
+        {/* Container com a imagem */}
+        <View className="w-full h-[30%] items-center bg-[#2BB459] relative">
+          <View className="mt-7 mr-auto bg-[#2BB459] w-full">
+            <TouchableOpacity
+              className="ml-4"
+              onPress={() => navigation.goBack()}
+            >
+              <Icon name="angle-left" size={20} color="#fff" />
+            </TouchableOpacity>
+          </View>
+          <Image
+            source={require("../../../../assets/illustrations/forgot-password.png")}
+            className="w-[250] h-[240px] absolute top-[20%]"
+          />
+        </View>
+
+        <Text className="text-black font-bold text-2xl mt-[15%] mb-8">Esqueci minha senha</Text>
+
+        <View className="w-5/6">
           <TextInput
+            className="flex-1 h-12 bg-white rounded-lg px-4 border border-gray-300 mr-2"
             placeholder="Digite seu email"
             value={email}
             onChangeText={(text) => setEmail(text)}
           />
+
           <TouchableOpacity
-            style={{
-              width: '80%',
-              height: 40,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#2BB459',
-              borderRadius: 30,
-              marginBottom: 10,
-              marginTop: 20,
-            }}
+            className="w-full h-12 bg-green-500 rounded-lg items-center justify-center mt-4"
             onPress={handleVerificaEmail}
           >
-            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
+            <Text className="text-white font-bold text-lg">
               Verificar Email
             </Text>
           </TouchableOpacity>
         </View>
-        <View className="flex flex-row items-center">
-          <TextInput value={codigoDigitado}
-            onChangeText={(text) => setCodigoDigitado(text)} placeholder="Digite o código" style={{ flex: 1 }} editable={isCodigoEditable}/>
-          <TouchableOpacity style={{
-              width: '30%',
-              height: 40,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#2BB459',
-              borderRadius: 30,
-              marginBottom: 10,
-              marginTop: 20,
-            }}
+
+        <View className="flex-row items-center w-5/6 mt-10">
+          <TextInput
+            value={codigoDigitado}
+            onChangeText={(text) => setCodigoDigitado(text)}
+            placeholder="Digite o código"
+            className="flex-1 h-12 text-sm bg-white rounded-lg px-4 border border-gray-300 mr-2"
+            editable={isCodigoEditable}
+          />
+
+          <TouchableOpacity
+            className="w-1/3 h-12 bg-green-500 rounded-lg items-center justify-center"
             onPress={handleEnviarCodigo}
             disabled={isBtnCodigoDisabled}
-            >
-            <Text>{textCodigo}</Text>
+          >
+            <Text className="text-white font-bold">{textCodigo}</Text>
           </TouchableOpacity>
         </View>
-        <View className="flex flex-row items-center">
-          <TextInput value={newPassword} onChangeText={(text) => setNewPassword(text)} placeholder="Digite uma nova senha" style={{ flex: 1 }} editable={isPasswordEditable}/>
-          <TouchableOpacity style={{
-              width: '30%',
-              height: 40,
-              alignItems: 'center',
-              justifyContent: 'center',
-              backgroundColor: '#2BB459',
-              borderRadius: 30,
-              marginBottom: 10,
-              marginTop: 20,
-            }}
+
+        <View className="flex-row items-center w-5/6 mt-4">
+          <TextInput
+            value={newPassword}
+            onChangeText={(text) => setNewPassword(text)}
+            placeholder="Digite uma nova senha"
+            className="flex-1 h-12 text-sm bg-white rounded-lg px-4 border border-gray-300 mr-2"
+            editable={isPasswordEditable}
+          />
+
+          <TouchableOpacity
+            className="w-1/3 h-12 bg-green-500 rounded-lg items-center justify-center"
             disabled={isBtnPasswordDisabled}
             onPress={handleAtualizarSenha}
-            >
-            <Text>Atualizar senha</Text>
+          >
+            <Text className="text-white font-bold">Atualizar senha</Text>
           </TouchableOpacity>
         </View>
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-        <Text style={{ color: '#9E9EA0', fontWeight: 'bold', fontSize: 16, marginTop: 10 }}>
-          Voltar
-        </Text>
-      </TouchableOpacity>
-    </View>
+      </View>
+    </ScrollView>
   );
 }
