@@ -68,8 +68,6 @@ class UsuarioController{
         }
       }
       
-
-
       static async CodigoAleatorio(email: string): Promise<string | null> {
         try{
           console.log("Email passado: ", email)

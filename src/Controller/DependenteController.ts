@@ -42,3 +42,5 @@ class DependenteController{
         }
     }
 }
+
+export default DependenteController;

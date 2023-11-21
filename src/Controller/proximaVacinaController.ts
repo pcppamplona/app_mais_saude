@@ -52,6 +52,15 @@ class proximaVacinaController{
             throw error;
         }
     }
+
+    static async buscarProxVacinas(id_dependente:number){
+      try{
+        const proxVacinasGet = ProximaVacina.buscarProxVacinas(id_dependente);
+        return proxVacinasGet;
+      }catch(error){
+        throw error
+      }
+    }
 }
 
 export default proximaVacinaController

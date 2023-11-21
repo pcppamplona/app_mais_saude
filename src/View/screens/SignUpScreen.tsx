@@ -59,9 +59,9 @@ export function SignUpScreen({ navigation }) {
       UsuarioController.cadastrarUsuario(
         email,
         password,
-        name,
-        cpf,
-        formattedDate,
+        name, 
+        cpf, 
+        formattedDate, 
         sexo
       );
     }
