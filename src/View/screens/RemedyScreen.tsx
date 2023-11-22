@@ -280,11 +280,14 @@ export function RemedyScreen({ navigation }) {
 
         {remedios.length === 0 ? (
           <View>
-            <View className="ml-4 mr-auto mt-10 mb-10">
+            <View className="flex flex-row w-full justify-between items-center mr-auto py-7 px-4">
               <Text className="font-bold text-2xl text-[#28282D]">
                 Medicamentos
               </Text>
+
+              <Text className="font-bold text-xs text-[#1F9A55]">Ajuda</Text>
             </View>
+            
             <Image
               source={require("../../../assets/backgrounds/fundoRemedyComplete.png")}
               className="w-full h-auto top-[5%] bottom-0 animate-pulse"
