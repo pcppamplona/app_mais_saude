@@ -3,6 +3,9 @@ import supabase from "./services/supabase";
 import { supabaseApiKey } from "./services/supabaseApiKey";
 import UsuarioController from "../Controller/UsuarioController";
 
+
+
+
 class Usuario{
     Email: string;
     Senha: string;

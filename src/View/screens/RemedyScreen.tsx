@@ -131,8 +131,25 @@ export function RemedyScreen({ navigation }) {
       async (notification) => {
         console.log("Nova notificação!");
         const idNotificacao = notification.request.content.data.id;
+        const nomeNotificacao = notification.request.content.data.nome;
+        const frequenciaNotificacao = notification.request.content.data.frequencia;
+        let totalDosesNotificacao = notification.request.content.data.qntdTotalDoses;
+        console.log("Dados da notificação:"+"id:"+idNotificacao+"| Nome:"+nomeNotificacao+"| Frequencia:"+frequenciaNotificacao+"| Quantidade total de doses:"+totalDosesNotificacao)
         try {
-          await RemedioController.atualizarQntdDosesRestantes(idNotificacao, 1);
+          if(totalDosesNotificacao > 0){
+            totalDosesNotificacao =  totalDosesNotificacao - 1
+            console.log("totalDosesNotificacao:"+totalDosesNotificacao)
+            await RemedioController.atualizarQntdDosesRestantes(idNotificacao, 1);
+            await agendarDemaisNotificacoes(idNotificacao, nomeNotificacao, frequenciaNotificacao, totalDosesNotificacao);
+            try{
+              await updateRemediosList();
+            }catch(error){
+              throw error;
+            }
+          }else{
+            console.log("FIM das notificações desse remédio");
+            return;
+          }
         } catch (error) {
           throw error;
         }
@@ -145,46 +162,80 @@ export function RemedyScreen({ navigation }) {
     nomeRemedio,
     horarioInicial,
     frequencia,
-    qntdTotalDoses
+    qntdTotalDoses,
+    isEdited?
   ) {
+    if(isEdited == true){
+      console.log("isEdited é true")
+      var newqntdTotalDoses = 3;
+      qntdTotalDoses = newqntdTotalDoses;
+    }else{
+      qntdTotalDoses = qntdTotalDoses;
+      console.log("Total doses novo:"+qntdTotalDoses);
+    }
+
+    
+    const agora = new Date();
     const partesHorario = horarioInicial.split(":");
-    const horas = parseInt(partesHorario[0]);
-    const minutos = parseInt(partesHorario[1]);
-    const segundos = parseInt(partesHorario[2]);
+    const horasInicial = parseInt(partesHorario[0]);
+    const minutosInicial = parseInt(partesHorario[1]);
+    const segundosInicial = parseInt(partesHorario[2]);
+
+    const horaInicial = new Date();
+    horaInicial.setHours(horasInicial, minutosInicial, segundosInicial);
+
+    const diferencaEmMilissegundos = horaInicial.getTime() - agora.getTime();
+    const diferencaEmSegundos = diferencaEmMilissegundos / 1000;
+
+    //convertendo frequencia
 
     const partesFrequencia = frequencia.split(":");
-    const frequenciaHoras = parseInt(partesFrequencia[0]);
-    const frequenciaMinutos = parseInt(partesFrequencia[1]);
-    const frequenciaSegundos = parseInt(partesFrequencia[2]);
+    const horas = parseInt(partesFrequencia[0]);
+    const minutos = parseInt(partesFrequencia[1]);
+    const segundos = parseInt(partesFrequencia[2]);
 
-    for (let i = 0; i < qntdTotalDoses; i++) {
-      // Calcule os segundos para a próxima dose
-      const segundosParaProximaDose =
-        i *
-        (frequenciaHoras * 3600 + frequenciaMinutos * 60 + frequenciaSegundos);
+    const frequenciaFinal = horas * 3600 + minutos * 60 + segundos;
+    
+    console.log("Diferença em segundos:"+diferencaEmSegundos)
+    console.log("Frequencia em segundos:"+frequenciaFinal)
 
-      // Calcule o horário da próxima dose
-      const proximaDose = new Date();
-      proximaDose.setHours(horas, minutos, segundos);
-      proximaDose.setTime(
-        proximaDose.getTime() + segundosParaProximaDose * 1000
-      );
-
-      // Agende a notificação associando-a ao remédio específico
-      await Notifications.scheduleNotificationAsync({
-        content: {
-          title: "Lembrete de Medicamento",
-          body: `Hora de tomar ${nomeRemedio}`,
-          data: {
-            id: idRemedio,
-          },
+    const trigger = new Date(Date.now());
+    trigger.setSeconds(trigger.getSeconds() + diferencaEmSegundos);
+    
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Lembrete de Medicamento",
+        body: `Hora de tomar ${nomeRemedio}`,
+        data: {
+          id: idRemedio,
+          nome:nomeRemedio, 
+          frequencia:frequenciaFinal,
+          qntdTotalDoses:qntdTotalDoses,
         },
-        trigger: {
-          date: proximaDose,
+      },
+      trigger,
+      identifier: idRemedio.toString(),
+    });
+  }
+
+  async function agendarDemaisNotificacoes(idRemedio, nomeRemedio, frequenciaFinal, qntdTotalDoses){
+    const trigger = new Date(Date.now());
+    trigger.setSeconds(trigger.getSeconds() + frequenciaFinal);
+    
+    await Notifications.scheduleNotificationAsync({
+      content: {
+        title: "Lembrete de Medicamento",
+        body: `Hora de tomar ${nomeRemedio}`,
+        data: {
+          id: idRemedio,
+          nome:nomeRemedio, 
+          frequencia:frequenciaFinal,
+          qntdTotalDoses:qntdTotalDoses,
         },
-        identifier: idRemedio.toString(), // Usando idRemedio como identificador único
-      });
-    }
+      },
+      trigger,
+      identifier: idRemedio.toString(),
+    });
   }
 
   async function editarNotificacao(
@@ -194,6 +245,7 @@ export function RemedyScreen({ navigation }) {
     novaqntdDias: number,
     novaFrequencia: string
   ) {
+    const isEdited = true;
     console.log("Editando agendamento");
     await Notifications.cancelScheduledNotificationAsync(idRemedio.toString());
     await agendarNotificacoes(
@@ -201,14 +253,15 @@ export function RemedyScreen({ navigation }) {
       novoNome,
       novoHorario,
       novaFrequencia,
-      novaqntdDias
+      novaqntdDias, 
+      isEdited
     );
   }
 
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldShowAlert: true,
-      shouldPlaySound: false,
+      shouldPlaySound: true,
       shouldSetBadge: false,
     }),
   });
@@ -280,14 +333,11 @@ export function RemedyScreen({ navigation }) {
 
         {remedios.length === 0 ? (
           <View>
-            <View className="flex flex-row w-full justify-between items-center mr-auto py-7 px-4">
+            <View className="ml-4 mr-auto mt-10 mb-10">
               <Text className="font-bold text-2xl text-[#28282D]">
                 Medicamentos
               </Text>
-
-              <Text className="font-bold text-xs text-[#1F9A55]">Ajuda</Text>
             </View>
-            
             <Image
               source={require("../../../assets/backgrounds/fundoRemedyComplete.png")}
               className="w-full h-auto top-[5%] bottom-0 animate-pulse"
