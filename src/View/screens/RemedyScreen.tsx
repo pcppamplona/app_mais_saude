@@ -132,21 +132,41 @@ export function RemedyScreen({ navigation }) {
         console.log("Nova notificação!");
         const idNotificacao = notification.request.content.data.id;
         const nomeNotificacao = notification.request.content.data.nome;
-        const frequenciaNotificacao = notification.request.content.data.frequencia;
-        let totalDosesNotificacao = notification.request.content.data.qntdTotalDoses;
-        console.log("Dados da notificação:"+"id:"+idNotificacao+"| Nome:"+nomeNotificacao+"| Frequencia:"+frequenciaNotificacao+"| Quantidade total de doses:"+totalDosesNotificacao)
+        const frequenciaNotificacao =
+          notification.request.content.data.frequencia;
+        let totalDosesNotificacao =
+          notification.request.content.data.qntdTotalDoses;
+        console.log(
+          "Dados da notificação:" +
+            "id:" +
+            idNotificacao +
+            "| Nome:" +
+            nomeNotificacao +
+            "| Frequencia:" +
+            frequenciaNotificacao +
+            "| Quantidade total de doses:" +
+            totalDosesNotificacao
+        );
         try {
-          if(totalDosesNotificacao > 0){
-            totalDosesNotificacao =  totalDosesNotificacao - 1
-            console.log("totalDosesNotificacao:"+totalDosesNotificacao)
-            await RemedioController.atualizarQntdDosesRestantes(idNotificacao, 1);
-            await agendarDemaisNotificacoes(idNotificacao, nomeNotificacao, frequenciaNotificacao, totalDosesNotificacao);
-            try{
+          if (totalDosesNotificacao > 0) {
+            totalDosesNotificacao = totalDosesNotificacao - 1;
+            console.log("totalDosesNotificacao:" + totalDosesNotificacao);
+            await RemedioController.atualizarQntdDosesRestantes(
+              idNotificacao,
+              1
+            );
+            await agendarDemaisNotificacoes(
+              idNotificacao,
+              nomeNotificacao,
+              frequenciaNotificacao,
+              totalDosesNotificacao
+            );
+            try {
               await updateRemediosList();
-            }catch(error){
+            } catch (error) {
               throw error;
             }
-          }else{
+          } else {
             console.log("FIM das notificações desse remédio");
             return;
           }
@@ -165,16 +185,15 @@ export function RemedyScreen({ navigation }) {
     qntdTotalDoses,
     isEdited?
   ) {
-    if(isEdited == true){
-      console.log("isEdited é true")
+    if (isEdited == true) {
+      console.log("isEdited é true");
       var newqntdTotalDoses = 3;
       qntdTotalDoses = newqntdTotalDoses;
-    }else{
+    } else {
       qntdTotalDoses = qntdTotalDoses;
-      console.log("Total doses novo:"+qntdTotalDoses);
+      console.log("Total doses novo:" + qntdTotalDoses);
     }
 
-    
     const agora = new Date();
     const partesHorario = horarioInicial.split(":");
     const horasInicial = parseInt(partesHorario[0]);
@@ -195,22 +214,22 @@ export function RemedyScreen({ navigation }) {
     const segundos = parseInt(partesFrequencia[2]);
 
     const frequenciaFinal = horas * 3600 + minutos * 60 + segundos;
-    
-    console.log("Diferença em segundos:"+diferencaEmSegundos)
-    console.log("Frequencia em segundos:"+frequenciaFinal)
+
+    console.log("Diferença em segundos:" + diferencaEmSegundos);
+    console.log("Frequencia em segundos:" + frequenciaFinal);
 
     const trigger = new Date(Date.now());
     trigger.setSeconds(trigger.getSeconds() + diferencaEmSegundos);
-    
+
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Lembrete de Medicamento",
         body: `Hora de tomar ${nomeRemedio}`,
         data: {
           id: idRemedio,
-          nome:nomeRemedio, 
-          frequencia:frequenciaFinal,
-          qntdTotalDoses:qntdTotalDoses,
+          nome: nomeRemedio,
+          frequencia: frequenciaFinal,
+          qntdTotalDoses: qntdTotalDoses,
         },
       },
       trigger,
@@ -218,19 +237,24 @@ export function RemedyScreen({ navigation }) {
     });
   }
 
-  async function agendarDemaisNotificacoes(idRemedio, nomeRemedio, frequenciaFinal, qntdTotalDoses){
+  async function agendarDemaisNotificacoes(
+    idRemedio,
+    nomeRemedio,
+    frequenciaFinal,
+    qntdTotalDoses
+  ) {
     const trigger = new Date(Date.now());
     trigger.setSeconds(trigger.getSeconds() + frequenciaFinal);
-    
+
     await Notifications.scheduleNotificationAsync({
       content: {
         title: "Lembrete de Medicamento",
         body: `Hora de tomar ${nomeRemedio}`,
         data: {
           id: idRemedio,
-          nome:nomeRemedio, 
-          frequencia:frequenciaFinal,
-          qntdTotalDoses:qntdTotalDoses,
+          nome: nomeRemedio,
+          frequencia: frequenciaFinal,
+          qntdTotalDoses: qntdTotalDoses,
         },
       },
       trigger,
@@ -253,7 +277,7 @@ export function RemedyScreen({ navigation }) {
       novoNome,
       novoHorario,
       novaFrequencia,
-      novaqntdDias, 
+      novaqntdDias,
       isEdited
     );
   }
@@ -333,10 +357,11 @@ export function RemedyScreen({ navigation }) {
 
         {remedios.length === 0 ? (
           <View>
-            <View className="ml-4 mr-auto mt-10 mb-10">
+            <View className="flex flex-row w-full justify-between items-center mr-auto py-8 px-4">
               <Text className="font-bold text-2xl text-[#28282D]">
                 Medicamentos
               </Text>
+              <Text className="font-bold text-xs text-[#1F9A55]">Ajuda</Text>
             </View>
             <Image
               source={require("../../../assets/backgrounds/fundoRemedyComplete.png")}
@@ -353,7 +378,7 @@ export function RemedyScreen({ navigation }) {
           </View>
         ) : (
           <>
-            <View className="flex flex-row w-11/12 justify-between items-center ml-4 mr-auto mt-10">
+            <View className="flex flex-row w-11/12 justify-between items-center ml-4 mr-auto pt-8">
               <Text className="font-bold text-2xl text-[#28282D]">
                 Medicamentos
               </Text>

@@ -39,7 +39,7 @@ export function VaccineScreen({ navigation }) {
 
       {vacinas.length === 0 ? (
         <View>
-          <View className="flex flex-row w-full justify-between items-center mr-auto py-7 px-4">
+          <View className="flex flex-row w-full justify-between items-center mr-auto py-8 px-4">
             <Text className="font-bold text-2xl text-[#28282D]">Vacinas</Text>
             <Text className="font-bold text-xs text-[#1F9A55]">Ajuda</Text>
           </View>
