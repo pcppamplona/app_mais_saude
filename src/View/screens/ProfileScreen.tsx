@@ -220,7 +220,7 @@ export function ProfileScreen({ navigation }) {
       <View className="w-full mt-6">
         {/* Informações do Campo Nome E-mail */}
         <View className="flex-row items-center justify-start pl-4 pr-4 mt-4">
-          <Icon name="email" size={18} color="#9E9EA0" className="mr-2" />
+          <Icon name="email" size={18} color="#9E9EA0" />
           {isEditing ? (
             <View>
               <TextInput
@@ -242,7 +242,7 @@ export function ProfileScreen({ navigation }) {
 
         {/* Informações do Campo Nome CPF */}
         <View className="flex-row items-center justify-start pl-4 pr-4 mt-4">
-          <SimpleIcon name="user" size={18} color="#9E9EA0" className="mr-2" />
+          <SimpleIcon name="user" size={18} color="#9E9EA0" />
           {isEditing ? (
             <View>
               <TextInput
@@ -285,7 +285,7 @@ export function ProfileScreen({ navigation }) {
 
         {/* Informações do Campo Nome Data */}
         <View className="flex-row items-center justify-start pl-4 pr-4 mt-4">
-          <Icon name="date" size={18} color="#9E9EA0" className="mr-2" />
+          <Icon name="date" size={18} color="#9E9EA0"  />
           {isEditing ? (
             <View>
               <TextInput
@@ -320,7 +320,6 @@ export function ProfileScreen({ navigation }) {
                 name="player-settings"
                 size={18}
                 color="#479962"
-                className="mr-2"
               />
               <Text className="text-sm font-bold ml-3 text-[#479962]">
                 Configurações
@@ -335,7 +334,7 @@ export function ProfileScreen({ navigation }) {
                 navigation.navigate("RecoverPass");
               }}
             >
-              <Icon name="locked" size={18} color="#727275" className="mr-2" />
+              <Icon name="locked" size={18} color="#727275" />
               <Text className="text-sm font-bold ml-3 text-[#727275]">
                 Redefinir senha
               </Text>
@@ -346,7 +345,7 @@ export function ProfileScreen({ navigation }) {
               className="flex-row items-center justify-start mt-4 pt-4 pl-4 pr-4 border-t-[1px] border-[#EAEAEA]"
               onPress={handleLogout}
             >
-              <Icon name="power" size={18} color="#FF183F" className="mr-2" />
+              <Icon name="power" size={18} color="#FF183F" />
               <Text className="text-sm font-bold ml-3 text-[#FF183F]">
                 Sair
               </Text>
@@ -360,7 +359,7 @@ export function ProfileScreen({ navigation }) {
               className="flex-row items-center justify-start mt-6 pt-4 pl-4 pr-4 border-t-[1px] border-[#EAEAEA]"
               onPress={toggleModal}
             >
-              <Icon name="trash" size={18} color="#FF183F" className="mr-2" />
+              <Icon name="trash" size={18} color="#FF183F"/>
               <Text className="text-sm font-bold ml-3 text-[#FF183F]">
                 Excluir conta
               </Text>

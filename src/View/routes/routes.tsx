@@ -14,6 +14,7 @@ import { RecoverPassScreen } from "../screens/ForgotPass/RecoverPassScreen";
 import { VaccineScreen } from "../screens/VaccineScreen";
 import { RemedyScreen } from "../screens/RemedyScreen";
 import { HealthCenterScreen } from "../screens/HealthCenterScreen";
+import { CalendarScreen } from "../screens/CalendarScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -119,6 +120,11 @@ export default function Routes() {
           <Stack.Screen
             name="HealthCenter"
             component={HealthCenterScreen}
+            options={{ headerShown: false}}
+          />
+          <Stack.Screen
+            name="Calendar"
+            component={CalendarScreen}
             options={{ headerShown: false}}
           />
           <Stack.Screen

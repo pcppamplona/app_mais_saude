@@ -14,8 +14,12 @@ import IconFontAwesome from "react-native-vector-icons/FontAwesome5";
 import healthData from "../../Controller/healthData.json";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { usuarioSessao } from "./LoginScreen";
+import { Linking } from "react-native";
+import Modal from "react-native-modal";
+import CustomDropdown from "../components/CustomDropdown";
 
 export function HealthCenterScreen({ navigation }) {
+  // State dos dados do json
   const [data, setData] = useState([]);
 
   // State para verificar se existe algum card expandido
@@ -33,6 +37,9 @@ export function HealthCenterScreen({ navigation }) {
 
   // State dos cards favoritos
   const [favorites, setFavorites] = useState([]);
+
+  const [subprefFilter, setSubprefFilter] = useState(null);
+  const [distritoFilter, setDistritoFilter] = useState(null);
 
   // Toggles para abrir e fechar a search Bar Condicional
   const toggleSearchBar = () => {
@@ -104,32 +111,35 @@ export function HealthCenterScreen({ navigation }) {
 
   const toggleFavorite = (itemId) => {
     const userId = usuarioSessao; // Assumindo que usuarioSessao contém o ID do usuário
-  
+
     if (favorites.includes(itemId)) {
       setFavorites(favorites.filter((id) => id !== itemId));
     } else {
       if (favorites.length < 2) {
         setFavorites([...favorites, itemId]);
-  
+
         // Salvar favoritos com o ID do usuário
         saveFavoritesWithUserId(userId, [...favorites, itemId]);
       }
     }
   };
-  
+
   const saveFavoritesWithUserId = async (userId, favoritesArray) => {
     try {
       // Obter favoritos existentes para o usuário
       const storedFavorites = await AsyncStorage.getItem(`favorites_${userId}`);
-  
+
       let userFavorites = [];
       if (storedFavorites) {
         userFavorites = JSON.parse(storedFavorites);
       }
-  
+
       // Atualizar e salvar os favoritos para o usuário
       userFavorites = [...userFavorites, ...favoritesArray];
-      await AsyncStorage.setItem(`favorites_${userId}`, JSON.stringify(userFavorites));
+      await AsyncStorage.setItem(
+        `favorites_${userId}`,
+        JSON.stringify(userFavorites)
+      );
     } catch (error) {
       console.error("Erro ao salvar os favoritos:", error);
     }
@@ -138,7 +148,7 @@ export function HealthCenterScreen({ navigation }) {
   const loadFavorites = async () => {
     try {
       const userId = usuarioSessao; // Assumindo que usuarioSessao contém o ID do usuário
-  
+
       // Obter favoritos do usuário
       const storedFavorites = await AsyncStorage.getItem(`favorites_${userId}`);
       if (storedFavorites) {
@@ -148,7 +158,19 @@ export function HealthCenterScreen({ navigation }) {
       console.error("Erro ao carregar os favoritos:", error);
     }
   };
-  
+
+  useEffect(() => {
+    const filtered = data.filter(
+      (item) =>
+        item.ESTABELECI.toLowerCase().includes(searchText.toLowerCase()) &&
+        (!subprefFilter ||
+          item.SUBPREF.toLowerCase() === subprefFilter.toLowerCase()) &&
+        (!distritoFilter ||
+          item.DISTRITO.toLowerCase() === distritoFilter.toLowerCase())
+    );
+    setFilteredData(filtered);
+  }, [searchText, data, subprefFilter, distritoFilter]);
+
   //Render dos items do FlatList, que chamam os dados do Json
   const renderItem = ({ item }) => (
     <TouchableOpacity onPress={() => toggleExpandedItem(item.ID)}>
@@ -253,22 +275,42 @@ export function HealthCenterScreen({ navigation }) {
         <Text className="font-bold text-2xl text-[#28282D]">
           Redes de Saúde
         </Text>
-        <TouchableOpacity  onPress={isFilterVisible ? closeFilter : toggleFilter}>
-          <IconFontAwesome 
+        <TouchableOpacity
+          onPress={isFilterVisible ? closeFilter : toggleFilter}
+        >
+          <IconFontAwesome
             name={isFilterVisible ? "times" : "filter"}
-            size={18} 
-            color="#2BB459" 
+            size={18}
+            color="#2BB459"
           />
         </TouchableOpacity>
       </View>
 
       {/* Filtros Condicionais */}
       {isFilterVisible && (
-        <View className="flex flex-row w-11/12 mt-4 justify-center">
-          <Text className="text-black">Filtros</Text>
-        
+        <View className="flex flex-col w-11/12 mt-4 mb-6 justify-center">
+          <Text className="text-black mr-2">Filtros:</Text>
+
+          <View className="flex flex-row">
+            {/* Filtro por SUBPREF */}
+            <CustomDropdown
+              options={[...new Set(data.map((item) => item.SUBPREF))]}
+              selectedValue={subprefFilter}
+              onValueChange={(value) => setSubprefFilter(value)}
+              placeholder="Prefeitura"
+            />
+
+            {/* Filtro por DISTRITO */}
+            <CustomDropdown
+              options={[...new Set(data.map((item) => item.DISTRITO))]}
+              selectedValue={distritoFilter}
+              onValueChange={(value) => setDistritoFilter(value)}
+              placeholder="Distrito"
+            />
+          </View>
         </View>
       )}
+
 
       {/* Barra de pesquisa (condicional) */}
       {isSearchBarVisible && (
@@ -278,6 +320,7 @@ export function HealthCenterScreen({ navigation }) {
             alignItems: "center",
             marginHorizontal: 16,
             marginTop: 8,
+            marginBottom: 2,
           }}
         >
           <TextInput
@@ -286,9 +329,6 @@ export function HealthCenterScreen({ navigation }) {
             value={searchText}
             onChangeText={(text) => setSearchText(text)}
           />
-          {/* <TouchableOpacity className="ml-2" onPress={() => closeSearchBar()}>
-            <IconFontAwesome name="times" size={20} color="#2BB459" />
-          </TouchableOpacity> */}
         </View>
       )}
 
@@ -296,7 +336,7 @@ export function HealthCenterScreen({ navigation }) {
       {favorites.length !== 0 && (
         <View className="flex flex-row w-11/12 mt-4 items-center justify-start">
           <Text className="text-sm font-bold mr-1 text-[#727275]">
-            Fixiados 
+            Fixiados
           </Text>
           <IconFontAwesome name="thumbtack" size={12} color="#727275" />
         </View>
@@ -306,7 +346,7 @@ export function HealthCenterScreen({ navigation }) {
         className="py-2 w-11/12"
         data={[
           ...favorites.map((id) => data.find((item) => item.ID === id)),
-          
+
           ...filteredData.filter((item) => !favorites.includes(item.ID)),
         ]}
         renderItem={renderItem}
