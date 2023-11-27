@@ -27,6 +27,12 @@ class CarteiraDependente {
 
       const dependentesDiretos = responseDependentes.data;
 
+      // Verificar se há dependentes antes de continuar
+      if (dependentesDiretos.length === 0) {
+        console.log("O usuário não tem dependentes.");
+        return [];
+      }
+
       // Passo 2: Extrair os IDs dos dependentes diretos
       const dependentesDiretosIds = dependentesDiretos.map(
         (dependente) => dependente.id_dependente
@@ -72,7 +78,7 @@ class CarteiraDependente {
 
       console.log("Carteira(dependente) criada com sucesso:", response.data);
     } catch (error) {
-      console.error("Erro ao inserir dados do remédio:", error);
+      console.error("Erro ao criar carteira:", error);
       throw error;
     }
   }

@@ -35,3 +35,5 @@ class vacinaDependenteController{
         }
     }
 }
+
+export default vacinaDependenteController;

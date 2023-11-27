@@ -1,7 +1,7 @@
 import Carteira from "../Model/Carteira";
 
 class CarteiraController{
-    static async buscarCarteirasDependentes(id_usuario:number){
+    static async buscarCarteira(id_usuario:number){
         try{
             const carteira = await Carteira.buscarCarteira(id_usuario)
             return carteira;
@@ -10,7 +10,7 @@ class CarteiraController{
         }
     }
 
-    static async cadastrarCarteiraDependentes(id_usuario:number){
+    static async cadastrarCarteira(id_usuario:number){
         try{
             const carteira = new Carteira(id_usuario);
             carteira.cadastrarCarteira(id_usuario);

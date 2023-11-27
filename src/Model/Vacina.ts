@@ -50,10 +50,11 @@ class Vacina {
     Dose: number
   ) {
     try {
+      console.log("No model:"+id_carteira+Nome_Vacina+Local_Vacinacao+Data_Vacinacao+Dose)
       const response = await supabase.post(
         `https://ikxyjoeduutnzqkynsfr.supabase.co/rest/v1/Vacina`, // Substitua "seu-tabela" pelo nome da tabela que você deseja inserir os dados
         {
-          id_carteiraDependente: id_carteira,
+          id_carteira: id_carteira,
           Nome_Vacina: Nome_Vacina,
           Local_Vacinacao: Local_Vacinacao,
           Data_Vacinacao: Data_Vacinacao,

@@ -47,7 +47,7 @@ class Carteira {
         }
       );
 
-      console.log("Carteira(dependente) criada com sucesso:", response.data);
+      console.log("Carteira criada com sucesso:", response.data);
     } catch (error) {
       console.error("Erro ao inserir dados do remédio:", error);
       throw error;

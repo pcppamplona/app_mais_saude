@@ -11,10 +11,13 @@ class DependenteController{
     }
 
     static async cadastrarDependentes(id_usuario:number, Nome_Completo: string, Data_Nascimento: string, Sexo: string){
-        const dataNascimentoParts = Data_Nascimento.split('-');
-        const dataNascimentoFormatted = `${dataNascimentoParts[2]}-${dataNascimentoParts[1]}-${dataNascimentoParts[0]}`; 
-        const dependente = new Dependente(id_usuario, Nome_Completo, dataNascimentoFormatted, Sexo);
-        dependente.cadastrarDependente(id_usuario, Nome_Completo, dataNascimentoFormatted, Sexo);
+       try{
+        const dependente = new Dependente(id_usuario, Nome_Completo, Data_Nascimento, Sexo);
+        console.log("No controller:"+id_usuario+Nome_Completo+Data_Nascimento+Sexo)
+        dependente.cadastrarDependente(id_usuario, Nome_Completo, Data_Nascimento, Sexo);
+       }catch(error){
+        throw error;
+       }
     }
 
     static async buscarDependenteId(id_dependente:number){

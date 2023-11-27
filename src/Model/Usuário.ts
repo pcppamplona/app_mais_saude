@@ -154,10 +154,16 @@ class Usuario{
         }
       }
 
-      static async ExcluirConta(idUsuario: number, senha: string) {
+      static async ExcluirConta(idUsuario: number) {
         try {
+          // Verificar e obter o ID da carteira associada
+          const id_carteira = await Usuario.verificarCarteira(idUsuario);
+
+          // Excluir a carteira dependente (se existir)
+          await Usuario.excluirCarteira(id_carteira);
+
           // Verifique a senha diretamente no banco de dados usando a URL do Supabase
-          const response = await axios.get(`https://ikxyjoeduutnzqkynsfr.supabase.co/rest/v1/Usuário?id_usuario=eq.${idUsuario}&Senha=eq.${senha}`, {
+          const response = await axios.get(`https://ikxyjoeduutnzqkynsfr.supabase.co/rest/v1/Usuário?id_usuario=eq.${idUsuario}`, {
             headers: {
               'apikey': supabaseApiKey,
             },
@@ -268,6 +274,53 @@ class Usuario{
           console.log("Senha atualizada com sucesso:", updateResponse.data);
         }catch(error){
           console.error("Erro ao atualizar senha:", error);
+          throw error;
+        }
+      }
+
+      static async verificarCarteira(idUsuario: number): Promise<number | null> {
+        try {
+          const response = await supabase.get(
+            `https://ikxyjoeduutnzqkynsfr.supabase.co/rest/v1/Carteira?id_usuario=eq.${idUsuario}`,
+            {
+              headers: {
+                apikey: supabaseApiKey,
+                "Content-Type": "application/json",
+              },
+            }
+          );
+      
+          if (response.data.length > 0) {
+            // Retorna o ID da carteira associada ao dependente
+            return response.data[0].id_carteira;
+          } else {
+            // Não há carteira associada ao dependente
+            console.log("Não tem carteira")
+            return null;
+          }
+        } catch (error) {
+          console.error("Erro ao verificar carteira dependente:", error);
+          throw error;
+        }
+      }
+    
+      static async excluirCarteira(id_carteira: number): Promise<void> {
+        try {
+          if (id_carteira) {
+            const response = await supabase.delete(
+              `https://ikxyjoeduutnzqkynsfr.supabase.co/rest/v1/Carteira?id_carteira=eq.${id_carteira}`,
+              {
+                headers: {
+                  apikey: supabaseApiKey,
+                  "Content-Type": "application/json",
+                },
+              }
+            );
+      
+            console.log("Carteira dependente excluída com sucesso:", response.data);
+          }
+        } catch (error) {
+          console.error("Erro ao excluir carteira dependente:", error);
           throw error;
         }
       }

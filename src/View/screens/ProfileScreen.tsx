@@ -118,7 +118,7 @@ export function ProfileScreen({ navigation }) {
       // ou realizar qualquer ação desejada.
 
       // Por enquanto, vamos apenas fechar o modal:
-      await UsuarioController.ExcluirConta(usuarioSessao, password);
+      await UsuarioController.ExcluirConta(usuarioSessao);
       navigation.navigate("Login");
     } catch (error) {
       console.error("Erro ao excluir conta:", error);
@@ -132,6 +132,13 @@ export function ProfileScreen({ navigation }) {
   // Função para alternar entre a confirmação de exclusão e o campo de senha
   const toggleDeletionConfirmation = () => {
     setIsConfirmingDeletion(!isConfirmingDeletion);
+    try{
+      const deletarConta = UsuarioController.ExcluirConta(usuarioSessao)
+      setModalVisible(false)
+      navigation.navigate("Login");
+    }catch{
+
+    }
   };
 
   const handleLogout = () => {
@@ -285,7 +292,7 @@ export function ProfileScreen({ navigation }) {
 
         {/* Informações do Campo Nome Data */}
         <View className="flex-row items-center justify-start pl-4 pr-4 mt-4">
-          <Icon name="date" size={18} color="#9E9EA0"  />
+          <Icon name="date" size={18} color="#9E9EA0" />
           {isEditing ? (
             <View>
               <TextInput
@@ -359,7 +366,7 @@ export function ProfileScreen({ navigation }) {
               className="flex-row items-center justify-start mt-6 pt-4 pl-4 pr-4 border-t-[1px] border-[#EAEAEA]"
               onPress={toggleModal}
             >
-              <Icon name="trash" size={18} color="#FF183F"/>
+              <Icon name="trash" size={18} color="#FF183F" />
               <Text className="text-sm font-bold ml-3 text-[#FF183F]">
                 Excluir conta
               </Text>

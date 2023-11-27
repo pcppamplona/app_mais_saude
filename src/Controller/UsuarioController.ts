@@ -59,9 +59,9 @@ class UsuarioController{
         }
       }
 
-      static async ExcluirConta(idUsuario: number, senha: string){
+      static async ExcluirConta(idUsuario: number){
         try{
-            await Usuario.ExcluirConta(idUsuario, senha)
+            await Usuario.ExcluirConta(idUsuario)
         }catch(error){
           console.error("Erro ao excluir conta:", error);
           throw error;
