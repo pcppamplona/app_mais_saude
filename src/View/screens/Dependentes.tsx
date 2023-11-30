@@ -507,25 +507,41 @@ export function Dependentes({ navigation }) {
     
       </Modal>
       <Modal isVisible={isProxVacModalVisible}>
-        <View style={{ flex: 1, backgroundColor: "white", padding: 20 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 2 }}>
-            Próximas vacinas
+        <View className="flex flex-col bg-white p-5 h-800 m-7 justify-center items-center rounded-xl">
+          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 8 }}>
+            Próxima da Vacina
           </Text>
           {informacoesDependentes.map((info, index) => (
             <View key={index}>
-              <Text>Nome:{info.Nome_Dependente}</Text>
-              <Text>Vacina:{info.Nome_Vacina}</Text>
-              <Text>Dose:{info.Dose}</Text>
+              <View className="flex flex-row items-center">
+                <Text className="text-sm font-semibold">Paciente -  </Text>
+                <Text>{info.Nome_Dependente}</Text>
+              </View>
+              <View className="flex flex-row items-center">
+                <Text className="text-sm font-semibold">Vacina -  </Text>
+                <Text>{info.Nome_Vacina}</Text>
+              </View><View className="flex flex-row items-center">
+                <Text className="text-sm font-semibold">Dose -  </Text>
+                <Text>{info.Dose}</Text>
+              </View>
+            
               <View
                 style={{
                   borderBottomWidth: 1,
                   borderBottomColor: "gray",
-                  marginBottom: 10,
+                  marginBottom: 20,
+                  marginTop: 20,
                 }}
               ></View>
             </View>
           ))}
-          <Button title="Fechar" onPress={() => openProxModal()} />
+          <TouchableOpacity
+              className="w-[96px] rounded-md flex flex-row justify-center p-2 bg-[#d25a5a]"
+              onPress={() => openProxModal()}
+            >
+              <Text className="text-white text-sm font-bold">Cancelar</Text>
+            </TouchableOpacity>
+          {/* <Button title="Fechar" onPress={() => openProxModal()} /> */}
         </View>
       </Modal>
       {dependentes.length === 0 ? (
