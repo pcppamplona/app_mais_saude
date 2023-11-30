@@ -16,6 +16,8 @@ import EditIcon from "react-native-vector-icons/FontAwesome5";
 import * as ImagePicker from "expo-image-picker";
 import { usuarioSessao } from "./LoginScreen";
 import UsuarioController from "../../Controller/UsuarioController";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { CommonActions } from "@react-navigation/native";
 
 interface UsuarioData {
   id_usuario: number;
@@ -141,14 +143,23 @@ export function ProfileScreen({ navigation }) {
     }
   };
 
-  const handleLogout = () => {
-    // Adicione aqui qualquer lógica necessária para realizar o logout,
-    // como limpar o token de autenticação, limpar o estado da sessão, etc.
+  const handleLogout = async () => {
+    try {
+      console.log("Logging out...");
+      // Clear the authentication token from AsyncStorage
+      await AsyncStorage.removeItem('token');
+      console.log("Logged out successfully.");
   
-    // Exemplo: Limpar o token de autenticação e redirecionar para a tela de login
-    // (Você pode ajustar isso conforme a implementação específica do seu aplicativo)
-    // AsyncStorage.removeItem('token'); // Se estiver usando AsyncStorage para armazenar o token
-    navigation.navigate("Login");
+      // Reset the navigation stack and navigate to the login screen
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Login' }],
+        })
+      );
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
   };
 
   return (

@@ -18,6 +18,8 @@ import Icon from "react-native-vector-icons/Fontisto";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import FontAwesome5 from "react-native-vector-icons/FontAwesome5";
+import Ionicons from "react-native-vector-icons/Ionicons";
+
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
 export function HomeScreen({ navigation }) {
@@ -230,7 +232,7 @@ export function HomeScreen({ navigation }) {
             <Image
               key={index}
               source={image}
-              style={{ width: windowWidth, height: 200, borderRadius: 4 }}
+              style={{ width: windowWidth, height: 200}}
             />
           ))}
         </Animated.View>
@@ -268,11 +270,11 @@ export function HomeScreen({ navigation }) {
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate("Vacinas");
+            navigation.navigate("Dependentes");
           }}
           className="w-16 h-16 flex justify-center items-center rounded-lg bg-[#f3f3f3]"
         >
-          <FontAwesome5 name="syringe" size={26} color="#5AD276" />
+          <Ionicons name="people-sharp" size={28} color="#5AD276" />
         </TouchableOpacity>
 
         <TouchableOpacity

@@ -11,8 +11,12 @@ import {
 import VacinaController from "../../Controller/VacinaController";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import Icon2 from "react-native-vector-icons/Fontisto";
+import Icon3 from "react-native-vector-icons/FontAwesome";
+import Icon4 from "react-native-vector-icons/MaterialCommunityIcons";
 import Modal from "react-native-modal";
 import { TextInputMask } from "react-native-masked-text";
+import DeleteIcon from "react-native-vector-icons/Fontisto";
+import EditIcon from "react-native-vector-icons/FontAwesome5";
 
 export function VaccinesUser({ route, navigation }) {
   const { id_carteira } = route.params;
@@ -27,6 +31,8 @@ export function VaccinesUser({ route, navigation }) {
   const [isEditarModalVisible, setIsEditarModalVisible] = useState(false);
 
   const [vacinaSelecionada, setVacinaSelecionada] = useState(null);
+  // State para verificar se existe algum card expandido
+  const [expandedItem, setExpandedItem] = useState(null);
 
   useEffect(() => {
     buscarVacinas();
@@ -130,36 +136,90 @@ export function VaccinesUser({ route, navigation }) {
     }
   }
 
+  //Lógica para fechar o expanded
+  const toggleExpandedItem = (itemId) => {
+    setExpandedItem((prevExpandedItem) =>
+      prevExpandedItem === itemId ? null : itemId
+    );
+  };
+
   const renderItem = ({ item }) => (
-    <View style={{ marginBottom: 16, borderBottomWidth: 1, paddingBottom: 8 }}>
-      <Text>ID da Vacina: {item.id_vacina}</Text>
-      <Text>Nome da Vacina: {item.Nome_Vacina}</Text>
-      <Text>Local da Vacinação: {item.Local_Vacinacao}</Text>
-      <Text>Data da Vacinação: {item.Data_Vacinacao}</Text>
-      <Text>Dose: {item.Dose}</Text>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          marginTop: 8,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() =>
-            openEditarModal(
-              item.id_vacina,
-              item.Nome_Vacina,
-              item.Local_Vacinacao,
-              item.Data_Vacinacao,
-              item.Dose
-            )
-          }
-        >
-          <Text>Editar</Text>
-        </TouchableOpacity>
-        <Button title="Excluir" onPress={() => excluirVacina(item.id_vacina)} />
+    <TouchableOpacity onPress={() => toggleExpandedItem(item.ID)}>
+      <View className="border border-gray-300 p-4 mb-4 rounded-lg shadow-md">
+        <View className="flex flex-row items-center justify-start">
+          <View className="flex w-10 h-10 justify-center items-center bg-gray-100 rounded-full mr-3">
+            <View>
+              <Image
+                source={require("../../../assets/illustrations/vacinaIcon2.png")}
+                className="w-10 h-10"
+              />
+            </View>
+          </View>
+
+          <View className="flex">
+            <View className="flex flex-row items-center">
+              <Text className="text-base font-bold">Vacina - </Text>
+              <Text className="text-base font-bold">{item.Nome_Vacina}</Text>
+            </View>
+            <View className="flex flex-row items-center">
+              <Text className="text-xs font-semibold">Data da Vacinação: </Text>
+              <Text className="text-xs font-medium">{item.Data_Vacinacao}</Text>
+            </View>
+          </View>
+        </View>
+
+        {expandedItem === item.ID && (
+          <>
+            <View className="mt-2 ml-2">
+              <Text className="mt-2">
+                <Icon4 name="google-nearby" size={15} color="#7EE88D" /> Código
+                da Vacina: {item.id_vacina}
+              </Text>
+
+              <Text className="mt-2">
+                <Icon4 name="google-nearby" size={15} color="#7EE88D" /> Local
+                da Vacinação: {item.Local_Vacinacao}
+              </Text>
+
+              <Text className="mt-2">
+                <Icon4 name="google-nearby" size={15} color="#7EE88D" /> Dose:{" "}
+                {item.Dose}
+              </Text>
+            </View>
+
+            <View className="flex flex-row justify-start mt-6">
+              <TouchableOpacity
+                className="flex-row items-center p-2 bg-green-500 rounded-md"
+                onPress={() =>
+                  openEditarModal(
+                    item.id_vacina,
+                    item.Nome_Vacina,
+                    item.Local_Vacinacao,
+                    item.Data_Vacinacao,
+                    item.Dose
+                  )
+                }
+              >
+                <Text className="mr-2 text-white font-semibold text-[11px]">
+                  Editar
+                </Text>
+                <EditIcon name="edit" size={13} color="#fff" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                className="flex flex-row items-center rounded-md px-2 bg-[#FF183F] ml-5"
+                onPress={() => excluirVacina(item.id_vacina)}
+              >
+                <Text className="mr-2 text-white font-semibold text-[11px]">
+                  Excluir
+                </Text>
+                <DeleteIcon name="close" size={13} color="#fff" />
+              </TouchableOpacity>
+            </View>
+          </>
+        )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -185,26 +245,19 @@ export function VaccinesUser({ route, navigation }) {
         <TouchableOpacity onPress={() => navigation.goBack()}>
           <Icon2 name="angle-left" size={20} color="#1F9A55" />
         </TouchableOpacity>
-        <Text className="font-bold text-2xl text-[#28282D]">Vacinas</Text>
+        <Text className="font-bold text-2xl text-[#28282D]">Suas Vacinas</Text>
         <Text className="font-bold text-xs text-[#1F9A55]">Ajuda</Text>
       </View>
-      {/* <Text>
-                Id da carteira: { id_carteira }
-            </Text> */}
+
       <Modal isVisible={isModalVisible}>
-        <View style={{ flex: 1, backgroundColor: "white", padding: 20 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 2 }}>
-            Detalhes da Vacina
+        <View className="flex flex-col bg-white p-5 h-500 m-7 justify-center items-center rounded-xl">
+          <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+            Informações da Vacina
           </Text>
 
           {/* Nome da Vacina */}
           <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: "gray",
-              marginVertical: 10,
-              padding: 5,
-            }}
+            className="flex border-[1px] border-[#bebebf] p-2 w-11/12 rounded-lg mt-4"
             placeholder="Nome da Vacina"
             value={nomeVacina}
             onChangeText={setNomeVacina}
@@ -212,12 +265,7 @@ export function VaccinesUser({ route, navigation }) {
 
           {/* Local de Vacinação */}
           <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: "gray",
-              marginVertical: 10,
-              padding: 5,
-            }}
+            className="flex border-[1px] border-[#bebebf] p-2 w-11/12 rounded-lg mt-2"
             placeholder="Local de Vacinação"
             value={localVacinacao}
             onChangeText={setlocalVacinacao}
@@ -225,12 +273,7 @@ export function VaccinesUser({ route, navigation }) {
 
           {/* Data de Vacinação */}
           <TextInputMask
-            style={{
-              borderWidth: 1,
-              borderColor: "gray",
-              marginVertical: 10,
-              padding: 5,
-            }}
+            className="flex border-[1px] border-[#bebebf] p-2 w-11/12 rounded-lg mt-2"
             placeholder="Data de Vacinação"
             value={dataVacinacao}
             type={"datetime"}
@@ -242,63 +285,40 @@ export function VaccinesUser({ route, navigation }) {
 
           {/* Dose */}
           <TextInput
-            style={{
-              borderWidth: 1,
-              borderColor: "gray",
-              marginVertical: 10,
-              padding: 5,
-            }}
+            className="flex border-[1px] border-[#bebebf] p-2 w-11/12 rounded-lg mt-2"
             placeholder="Dose"
             keyboardType="numeric"
             value={dose}
             onChangeText={setDose}
           />
 
-          {/* Botão de Criar */}
-          <Button
-            title="Criar Vacina"
-            onPress={() =>
-              cadastrarVacina(nomeVacina, localVacinacao, dataVacinacao, dose)
-            }
-          />
+          <View className="flex flex-row justify-between mt-5 w-11/12">
+            <TouchableOpacity
+              className="w-[96px] rounded-md flex flex-row justify-center p-2 bg-[#5AD276]"
+              onPress={() => cadastrarVacina(nomeVacina, localVacinacao, dataVacinacao, dose)}
+            >
+              <Text className="text-white text-sm font-bold">Criar</Text>
+            </TouchableOpacity>
 
-          <View
-            style={{ height: 1, backgroundColor: "gray", marginVertical: 10 }}
-          />
-
-          {/* Botão de Cancelar */}
-          <View
-            style={{ flexDirection: "row", justifyContent: "space-between" }}
-          >
-            <Button title="Cancelar" onPress={toggleModal} />
+            <TouchableOpacity
+              className="w-[96px] rounded-md flex flex-row justify-center p-2 bg-[#d25a5a]"
+              onPress={toggleModal}
+            >
+              <Text className="text-white text-sm font-bold">Cancelar</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
       <Modal isVisible={isEditarModalVisible}>
         {vacinaSelecionada && (
-          <View style={{ flex: 1, backgroundColor: "white", padding: 20 }}>
-            <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 2 }}>
-              Detalhes da Vacina
+          <View className="flex flex-col bg-white p-5 h-700 m-7 justify-center items-center rounded-xl">
+            <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+              Editar Informações da Vacina
             </Text>
-
-            <TextInput
-              placeholder="ID da Vacina"
-              editable={false}
-              value={
-                vacinaSelecionada.id_vacina
-                  ? vacinaSelecionada.id_vacina.toString()
-                  : ""
-              }
-              onChangeText={(text) =>
-                setVacinaSelecionada({
-                  ...vacinaSelecionada,
-                  id_vacinaDependente: text,
-                })
-              }
-            />
 
             {/* Nome da Vacina */}
             <TextInput
+              className="flex border-[1px] border-[#bebebf] p-2 w-11/12 rounded-lg mt-2"
               placeholder="Nome da Vacina"
               value={vacinaSelecionada.Nome_Vacina}
               onChangeText={(text) =>
@@ -311,12 +331,7 @@ export function VaccinesUser({ route, navigation }) {
 
             {/* Local de Vacinação */}
             <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                marginVertical: 10,
-                padding: 5,
-              }}
+              className="flex border-[1px] border-[#bebebf] p-2 w-11/12 rounded-lg mt-2"
               placeholder="Local de Vacinação"
               value={vacinaSelecionada.Local_Vacinacao}
               onChangeText={(text) =>
@@ -329,12 +344,7 @@ export function VaccinesUser({ route, navigation }) {
 
             {/* Data de Vacinação */}
             <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                marginVertical: 10,
-                padding: 5,
-              }}
+              className="flex border-[1px] border-[#bebebf] p-2 w-11/12 rounded-lg mt-2"
               placeholder="Data de Vacinação"
               value={vacinaSelecionada.Data_Vacinacao}
               onChangeText={(text) =>
@@ -347,12 +357,7 @@ export function VaccinesUser({ route, navigation }) {
 
             {/* Dose */}
             <TextInput
-              style={{
-                borderWidth: 1,
-                borderColor: "gray",
-                marginVertical: 10,
-                padding: 5,
-              }}
+              className="flex border-[1px] border-[#bebebf] p-2 w-11/12 rounded-lg mt-2"
               placeholder="Dose"
               keyboardType="numeric"
               value={
@@ -362,24 +367,31 @@ export function VaccinesUser({ route, navigation }) {
                 setVacinaSelecionada({ ...vacinaSelecionada, Dose: text })
               }
             />
+            <View className="flex flex-row justify-between mt-5 w-11/12">
+              <TouchableOpacity
+                className="w-[96px] rounded-md flex flex-row justify-center p-2 bg-[#5AD276]"
+                onPress={() =>
+                  editarVacina(
+                    Number(vacinaSelecionada.id_vacina),
+                    vacinaSelecionada.Nome_Vacina,
+                    vacinaSelecionada.Local_Vacinacao,
+                    vacinaSelecionada.Data_Vacinacao,
+                    Number(vacinaSelecionada.Dose)
+                  )
+                }
+              >
+                <Text className="text-white text-sm font-bold">Editar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                className="w-[96px] rounded-md flex flex-row justify-center p-2 bg-[#d25a5a]"
+                onPress={() => setIsEditarModalVisible(false)}
+              >
+                <Text className="text-white text-sm font-bold">Cancelar</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
-        <Button
-          title="Salvar"
-          onPress={() =>
-            editarVacina(
-              Number(vacinaSelecionada.id_vacina),
-              vacinaSelecionada.Nome_Vacina,
-              vacinaSelecionada.Local_Vacinacao,
-              vacinaSelecionada.Data_Vacinacao,
-              Number(vacinaSelecionada.Dose)
-            )
-          }
-        />
-        <Button
-          title="Cancelar"
-          onPress={() => setIsEditarModalVisible(false)}
-        />
       </Modal>
       {vacinas.length === 0 ? (
         <View className="mt-[10%]">
@@ -402,25 +414,6 @@ export function VaccinesUser({ route, navigation }) {
               className="w-[160px] h-[150px] ml-16"
             />
           </View>
-
-          {/* <Modal isVisible={isModalVisible}>
-                <View style={{ flex: 1, backgroundColor: 'white', padding: 20 }}>
-                  <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom:2 }}>Criar sua carteira</Text>
-                  <Button title="Criar Carteira" disabled={isButtonDisabled} onPress={() => criarCarteira()} />
-                  <View style={{ height: 1, backgroundColor: 'gray', marginVertical: 10 }} />
-                  <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Criar carteira para dependente</Text>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 10 }}>
-                    <TextInput
-                      style={{ flex: 1, borderWidth: 1, borderColor: 'gray', marginRight: 10, padding: 5 }}
-                      placeholder="ID do Dependente" keyboardType="numeric" value={iddependente} onChangeText={setiddependente}
-                    />
-                    <Button title="Criar" onPress={() => criarCarteiraDependente(Number(iddependente))} />
-                  </View>
-                  <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginTop: 20 }}>
-                    <Button title="Cancelar" onPress={toggleModal} />
-                  </View>
-                </View>
-                </Modal> */}
         </View>
       ) : (
         <View style={{ flex: 1, padding: 16 }}>
