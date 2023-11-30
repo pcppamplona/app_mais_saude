@@ -64,6 +64,7 @@ export function ForgotPassScreen({ navigation }) {
       try {
         await UsuarioController.AtualizarSenha(email, newPassword);
         alert("Senha atualizada com sucesso!");
+        navigation.navigate("Login");
       } catch (error) {
         console.error("Erro ao atualizar senha:", error);
       }
@@ -87,11 +88,11 @@ export function ForgotPassScreen({ navigation }) {
           </View>
           <Image
             source={require("../../../../assets/illustrations/forgot-password.png")}
-            className="w-[250] h-[240px] absolute top-[20%]"
+            className="w-[200] h-[200px] absolute top-[20%]"
           />
         </View>
 
-        <Text className="text-black font-bold text-2xl mt-[15%] mb-8">Esqueci minha senha</Text>
+        <Text className="text-black font-bold text-lg mt-[15%] mb-8">Esqueci minha senha</Text>
 
         <View className="w-5/6">
           <TextInput
