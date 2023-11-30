@@ -15,6 +15,7 @@ import { VaccineScreen } from "../screens/VaccineScreen";
 import { RemedyScreen } from "../screens/RemedyScreen";
 import { HealthCenterScreen } from "../screens/HealthCenterScreen";
 import { CalendarScreen } from "../screens/CalendarScreen";
+import { VaccinesUser } from "../screens/VaccinesUser";
 
 const Tab = createBottomTabNavigator();
 
@@ -125,6 +126,11 @@ export default function Routes() {
           <Stack.Screen
             name="Calendar"
             component={CalendarScreen}
+            options={{ headerShown: false}}
+          />
+          <Stack.Screen
+            name="VaccinesUser"
+            component={VaccinesUser}
             options={{ headerShown: false}}
           />
           <Stack.Screen

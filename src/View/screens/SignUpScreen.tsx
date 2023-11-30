@@ -64,6 +64,7 @@ export function SignUpScreen({ navigation }) {
         formattedDate, 
         sexo
       );
+      navigation.navigate("Login");
     }
   };
 
