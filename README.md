@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="350" alt="Projeto +Vacinas" title="Projeto +Vacinas" src="https://raw.githubusercontent.com/pcppamplona/appmobile/main/assets/LogoOficial.png" />
+  <img width="350" alt="Projeto +Vacinas" title="Projeto +Vacinas" src="https://raw.githubusercontent.com/pcppamplona/appmobile/main/assets/logo.png" />
   
   <h1 align="center">Trabalho de Conclusão de Curso</h1>
 
