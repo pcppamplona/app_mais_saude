@@ -1,12 +1,12 @@
 <p align="center">
-  <img width="350" alt="Projeto +Vacinas" title="Projeto +Vacinas" src="https://raw.githubusercontent.com/pcppamplona/appmobile/main/assets/splash.png" />
+  <img width="350" alt="Projeto +Vacinas" title="Projeto +Vacinas" src="https://raw.githubusercontent.com/pcppamplona/appmobile/main/assets/LogoOficial.png" />
   
   <h1 align="center">Trabalho de Conclusão de Curso</h1>
 
 
 ##  💡 Sobre o Projeto
 
-O **+Vacinas** é uma aplicação móvel para agendamento, visualização, e documentação relacionada a vacinação em geral, com uma propósta de ser simples, rápido e eficiente, tornando toda a experiência relacionada a saúde e bem-estar menos burocrática para seus usuários.
+O **+Saúde** é uma aplicação móvel para agendamento, visualização, e documentação relacionada a vacinação em geral, com uma propósta de ser simples, rápido e eficiente, tornando toda a experiência relacionada a saúde e bem-estar menos burocrática para seus usuários.
 
 #
 
